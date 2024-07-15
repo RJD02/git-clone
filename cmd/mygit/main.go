@@ -1,8 +1,9 @@
 package main
 
 import (
+	"compress/zlib"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"os"
 )
 
@@ -32,30 +33,41 @@ func cmd_cat_file(arguments []string) {
 	}
 
 	sha_id := arguments[3]
-	folder_name := sha_id[0:3]
-	file_name := sha_id[3:]
+	folder_name := sha_id[0:2]
+	file_name := sha_id[2:]
 
-	file, err := os.Open(fmt.Sprintf("./.git/objects/%s/%s", folder_name, file_name))
+	curr_dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting current working directory")
+		return
+	}
+
+	file, err := os.Open(fmt.Sprintf("%s/.git/objects/%s/%s", curr_dir, folder_name, file_name))
 	if err != nil {
 		fmt.Println("Error opening the file", err)
 		return
 	}
 	defer file.Close()
 
-	content, err := io.ReadAll(file)
+	zr, err := zlib.NewReader(file)
 	if err != nil {
-
-		fmt.Println("Error reading the file", err)
+		fmt.Println("Error decoding the file")
 		return
 	}
 
-	fmt.Printf("%s", content)
+	decoded_content, err := ioutil.ReadAll(zr)
+	if err != nil {
+		fmt.Println("Error reading the decoded content")
+		return
+	}
+
+	fmt.Printf("%s", string(decoded_content))
 }
 
 // Usage: your_git.sh <command> <arg1> <arg2> ...
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	fmt.Println("Logs from your program will appear here!")
+	// fmt.Println("Logs from your program will appear here!")
 
 	// Uncomment this block to pass the first stage!
 
