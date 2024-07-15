@@ -1,12 +1,8 @@
 package main
 
 import (
-	"crypto/sha1"
 	"fmt"
 	"io"
-	"strings"
-
-	// Uncomment this block to pass the first stage!
 	"os"
 )
 
@@ -48,6 +44,7 @@ func cmd_cat_file(arguments []string) {
 
 	content, err := io.ReadAll(file)
 	if err != nil {
+
 		fmt.Println("Error reading the file", err)
 		return
 	}
