@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"compress/zlib"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
+	"strings"
 )
 
 func incorrect_usage_error() {
@@ -55,7 +57,22 @@ func cmd_cat_file(arguments []string) {
 		return
 	}
 
-	decoded_content, err := ioutil.ReadAll(zr)
+	scanner := bufio.NewScanner(zr)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		null_index := strings.Index(line, "\x00")
+		line = line[null_index+1:]
+
+		fmt.Println(line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error reading the decoded content")
+		return
+	}
+
+	decoded_content, err := io.ReadAll(zr)
 	if err != nil {
 		fmt.Println("Error reading the decoded content")
 		return
