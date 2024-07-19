@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"compress/zlib"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 )
@@ -58,13 +57,13 @@ func cmd_cat_file(arguments []string) {
 	}
 
 	scanner := bufio.NewScanner(zr)
+	var ans []string
 
 	for scanner.Scan() {
 		line := scanner.Text()
 		null_index := strings.Index(line, "\x00")
 		line = line[null_index+1:]
-
-		fmt.Println(line)
+		ans = append(ans, line)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -72,13 +71,9 @@ func cmd_cat_file(arguments []string) {
 		return
 	}
 
-	decoded_content, err := io.ReadAll(zr)
-	if err != nil {
-		fmt.Println("Error reading the decoded content")
-		return
-	}
+	// all ok
+	fmt.Printf("%s", strings.Join(ans, "\n"))
 
-	fmt.Printf("%s", string(decoded_content))
 }
 
 // Usage: your_git.sh <command> <arg1> <arg2> ...
